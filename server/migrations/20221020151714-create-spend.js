@@ -24,7 +24,7 @@ module.exports = {
 			spend_date: {
         type: DataTypes.DATE,
 			},
-      walletId: {
+      wallet_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },

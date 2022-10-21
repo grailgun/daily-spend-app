@@ -17,7 +17,11 @@ module.exports = {
 				type: DataTypes.STRING,
 				allowNull: false,
 			},
-			wallet_amount: {
+			wallet_initial_amount: {
+				type: DataTypes.DECIMAL,
+				defaultValue: 0,
+			},
+      wallet_amount: {
 				type: DataTypes.DECIMAL,
 				defaultValue: 0,
 			},

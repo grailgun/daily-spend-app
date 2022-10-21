@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
 		static associate({ Spend }) {
 			// define association here
 			this.hasMany(Spend, {
-				foreignKey: "walletId",
+				foreignKey: "wallet_id",
 				as: "spends",
 			});
 		}
@@ -34,7 +34,11 @@ module.exports = (sequelize, DataTypes) => {
 				type: DataTypes.STRING,
 				allowNull: false,
 			},
-			wallet_amount: {
+			wallet_initial_amount: {
+				type: DataTypes.DECIMAL,
+				defaultValue: 0,
+			},
+      wallet_amount: {
 				type: DataTypes.DECIMAL,
 				defaultValue: 0,
 			},

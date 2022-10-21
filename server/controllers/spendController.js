@@ -23,7 +23,7 @@ const addSpend = async (req, res) => {
 			description: description,
 			spend_amount: parseFloat(spendAmount),
 			spend_date: Date.now(),
-			walletId: wallet.id,
+			wallet_id: wallet.id,
 		});
 
 		return res.json(newSpend);
