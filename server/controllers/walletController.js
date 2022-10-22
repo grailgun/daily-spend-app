@@ -12,15 +12,28 @@ const getWallet = async (req, res) => {
 
 const addWallet = async (req, res) => {
 	const { walletName, walletAmount } = req.body;
+	const amount = parseFloat(walletAmount);
+
 	try {
-		const createdWallet = await Wallet.create({
-			wallet_name: walletName,
-			wallet_amount: parseInt(walletAmount),
+		const [wallet, isCreated] = await Wallet.findOrCreate({
+			where: {
+				wallet_name: walletName,
+			},
+			defaults: {
+				wallet_initial_amount: amount,
+				wallet_amount: amount,
+			},
 		});
 
-		return res.json(createdWallet);
+		if (!isCreated)
+			return res.json({
+				msg: "You already created this wallet",
+				wallet: wallet,
+			});
+
+		return res.json(wallet);
 	} catch (error) {
-		return res.status(500).json(error);
+		return res.json(error);
 	}
 };
 
@@ -36,7 +49,7 @@ const getWalletById = async (req, res) => {
 
 		return res.json(wallet);
 	} catch (error) {
-		return res.status(404).json(error);
+		return res.send(error);
 	}
 };
 

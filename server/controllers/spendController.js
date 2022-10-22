@@ -29,7 +29,7 @@ const addSpend = async (req, res) => {
 		return res.json(newSpend);
 	} catch (error) {
 		console.log(error);
-		return res.status(404).json(error);
+		return res.json(error);
 	}
 };
 
