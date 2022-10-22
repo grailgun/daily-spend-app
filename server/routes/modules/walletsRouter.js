@@ -7,8 +7,11 @@ router.use((req, res, next) => {
 	next();
 });
 
+// [endpoint]/api/wallets
 router.get("/", walletController.getWallet);
-router.get("/:id", walletController.getWalletById)
+router.get("/:id", walletController.getWalletById);
 router.post("/", walletController.addWallet);
+router.put("/:id", walletController.modifyWallet);
+router.delete("/:id", walletController.deleteWallet);
 
 module.exports = router;

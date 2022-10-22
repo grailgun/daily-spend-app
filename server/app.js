@@ -11,10 +11,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const mainRoute = require("./routes/index.js");
-app.use(mainRoute);
+app.use("/api",mainRoute);
 
 // Listen
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 function listen() {
 	app.listen(PORT, async () => {
 		console.log(`Server is connected to port : ${PORT}`);
