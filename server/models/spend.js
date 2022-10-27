@@ -10,15 +10,17 @@ module.exports = (sequelize, DataTypes) => {
 		static associate({ Wallet }) {
 			// define association here
 			this.belongsTo(Wallet, {
-				foreignKey: "wallet_id",
-				as: "wallet",
+				foreignKey: "wallet_id"
 			});
 		}
+
+    getWallets(){
+      console.log("Hello");
+    }
 
 		toJSON() {
 			return {
 				...this.get(),
-				id: undefined,
 				walletId: undefined,
 			};
 		}

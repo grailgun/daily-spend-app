@@ -9,5 +9,6 @@ router.use((req, res, next) => {
 
 router.post("/", spendController.addSpend);
 router.get("/", spendController.getAllSpend);
+router.delete("/:id", spendController.deleteSpend);
 
 module.exports = router;

@@ -1,9 +1,11 @@
-const { Wallet } = require("../models");
+const { Wallet, Spend, User } = require("../models");
 
 // Get all wallet from database
 const getWallet = async (req, res) => {
 	try {
-		const wallets = await Wallet.findAll({ include: "spends" });
+		const wallets = await Wallet.findAll({
+			attributes: ["wallet_name", "wallet_amount"],
+		});
 		return res.json(wallets);
 	} catch (error) {
 		console.log(error);
@@ -16,13 +18,17 @@ const getWalletById = async (req, res) => {
 	const id = req.params.id;
 	try {
 		const wallet = await Wallet.findOne({
+      attributes: ["id", ["wallet_name", "name"]],
 			where: { id: id },
-			include: "spends",
+      include: Spend
 		});
 
-		if (!wallet) return res.status(404).json({ msg: "Wallet not found" });
+		console.log(await wallet.getSpends());
+		if (!wallet) return res.status(404).json({ message: "Wallet not found" });
 
-		return res.json(wallet);
+		return res.json({
+			data: wallet,
+		});
 	} catch (error) {
 		return res.send(error);
 	}
@@ -61,7 +67,7 @@ const modifyWallet = async (req, res) => {
 	const walletAmount = req.body.walletAmount;
 
 	try {
-		await Wallet.update(
+		const result = await Wallet.update(
 			{
 				wallet_amount: parseFloat(walletAmount),
 			},
@@ -71,10 +77,7 @@ const modifyWallet = async (req, res) => {
 				},
 			}
 		);
-
-		return res.json({
-			message: "Success update the wallet",
-		});
+		res.json(checkWallet(result, "Success update the wallet!"));
 	} catch (error) {
 		console.log(error);
 		return res.json(error);
@@ -88,20 +91,24 @@ const deleteWallet = async (req, res) => {
 		where: { id: id },
 	})
 		.then((result) => {
-			if (result == 0) {
-				res.json({
-          message: "Wallet is not exist!",
-        });
-			} else {
-        res.json({
-          message: "Successfully delete the wallet : " + id ,
-        });        
-			}
+			res.json(checkWallet(result, "Success to delete the wallet!"));
 		})
 		.catch((error) => {
 			res.json(error);
 		});
 };
+
+function checkWallet(count, successMessage) {
+	if (count == 0) {
+		return {
+			message: "Wallet doesn't exist!",
+		};
+	} else {
+		return {
+			message: successMessage,
+		};
+	}
+}
 
 module.exports = {
 	addWallet,

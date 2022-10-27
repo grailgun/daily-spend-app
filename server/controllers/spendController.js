@@ -2,9 +2,10 @@ const { Spend, Wallet, sequelize } = require("../models");
 
 const getAllSpend = async (req, res) => {
 	try {
-		const spends = await Spend.findAll({ include: "wallet" });
-
-		return res.json(spends);
+		const spendInstance = await Spend.findAll({
+			include: Wallet,
+		});
+		return res.json(spendInstance);
 	} catch (error) {
 		console.log(error);
 		return res.status(404).json(error);
@@ -16,7 +17,7 @@ const addSpend = async (req, res) => {
 
 	try {
 		const wallet = await Wallet.findOne({ where: { uuid: walletId } });
-		if (!wallet) return res.status(404).json({ msg: "Wallet Not Found! " });
+		if (!wallet) return res.status(404).json({ message: "Wallet Not Found! " });
 
 		//create new spend
 		const newSpend = await Spend.create({
@@ -26,13 +27,86 @@ const addSpend = async (req, res) => {
 			wallet_id: wallet.id,
 		});
 
-		return res.json(newSpend);
+		wallet.wallet_amount -= newSpend.spend_amount;
+		wallet.save({ fields: ["wallet_amount"] }).then(() => {
+			res.json({
+				message: "Success add spend to wallet",
+				spend: newSpend,
+			});
+		});
 	} catch (error) {
 		console.log(error);
 		return res.json(error);
 	}
 };
 
+const deleteSpend = async (req, res) => {
+	const spendId = req.params.id;
+
+	try {
+		const spend = await Spend.findOne({
+			where: {
+				id: spendId,
+			},
+		});
+		if (!spend) {
+			return res.status(404).json({
+				message: "Spend not found!",
+			});
+		}
+
+		//Kalau punya spend kita dapatkan si wallet
+		const wallet = await spend.getWallet();
+		if (!wallet) {
+			return res.status(404).json({
+				message: "Spend not found!",
+			});
+		}
+		wallet.wallet_amount += spend.spend_amount;
+		wallet.save({ fields: ["wallet_amount"] });
+
+		const deleteResult = await Spend.destroy({
+			where: {
+				id: spendId,
+			},
+		});
+
+		if (deleteResult > 0) {
+			res.json({
+				message: "Success delete the spend",
+			});
+		}
+	} catch (error) {
+		res.json(error);
+	}
+
+	// Spend.destroy({
+	// 	where: {
+	// 		id: spendId,
+	// 	},
+	// })
+	// 	.then((result) => {
+	// 		res.json(checkSpend(result, "Success delete the spend"));
+	// 	})
+	// 	.catch((error) => {
+	// 		res.json(error);
+	// 	});
+};
+
+function checkSpend(count, successMessage) {
+	if (count == 0) {
+		return {
+			message: "Spend doesn't exist!",
+		};
+	} else {
+		return {
+			message: successMessage,
+		};
+	}
+}
+
 module.exports = {
-	addSpend, getAllSpend
+	addSpend,
+	getAllSpend,
+	deleteSpend,
 };
