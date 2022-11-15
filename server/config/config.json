@@ -1,7 +1,7 @@
 {
   "development": {
-    "username": "pgAdmin",
-    "password": "sinatrya1298",
+    "username": "postgres",
+    "password": "sinatrya",
     "database": "daily_spend",
     "host": "127.0.0.1",
     "dialect": "postgres"

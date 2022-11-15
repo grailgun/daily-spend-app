@@ -18,9 +18,9 @@ const getWalletById = async (req, res) => {
 	const id = req.params.id;
 	try {
 		const wallet = await Wallet.findOne({
-      attributes: ["id", ["wallet_name", "name"]],
+			attributes: ["id", ["wallet_name", "name"], ["wallet_amount", "amount"]],
 			where: { id: id },
-      include: Spend
+			include: Spend,
 		});
 
 		console.log(await wallet.getSpends());
@@ -51,7 +51,7 @@ const addWallet = async (req, res) => {
 		});
 
 		if (!isCreated)
-			return res.json({
+			return res.status(202).json({
 				msg: "You already created this wallet",
 				wallet: wallet,
 			});

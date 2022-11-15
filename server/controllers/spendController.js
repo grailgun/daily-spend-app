@@ -3,7 +3,20 @@ const { Spend, Wallet, sequelize } = require("../models");
 const getAllSpend = async (req, res) => {
 	try {
 		const spendInstance = await Spend.findAll({
-			include: Wallet,
+			attributes: [
+				"description",
+				["spend_amount", "amount"],
+				["spend_date", "date"],
+			],
+			include: [
+				{
+					model: Wallet,
+					attributes: [
+						["wallet_name", "name"],
+						["wallet_amount", "amount"],
+					],
+				},
+			],
 		});
 		return res.json(spendInstance);
 	} catch (error) {
@@ -16,7 +29,7 @@ const addSpend = async (req, res) => {
 	const { description, spendAmount, walletId } = req.body;
 
 	try {
-		const wallet = await Wallet.findOne({ where: { uuid: walletId } });
+		const wallet = await Wallet.findOne({ where: { id: walletId } });
 		if (!wallet) return res.status(404).json({ message: "Wallet Not Found! " });
 
 		//create new spend
@@ -79,18 +92,6 @@ const deleteSpend = async (req, res) => {
 	} catch (error) {
 		res.json(error);
 	}
-
-	// Spend.destroy({
-	// 	where: {
-	// 		id: spendId,
-	// 	},
-	// })
-	// 	.then((result) => {
-	// 		res.json(checkSpend(result, "Success delete the spend"));
-	// 	})
-	// 	.catch((error) => {
-	// 		res.json(error);
-	// 	});
 };
 
 function checkSpend(count, successMessage) {

@@ -21,9 +21,13 @@ module.exports = {
 				type: DataTypes.DECIMAL,
 				defaultValue: 0,
 			},
-      wallet_amount: {
+			wallet_amount: {
 				type: DataTypes.DECIMAL,
 				defaultValue: 0,
+			},
+			user_id: {
+				type: DataTypes.INTEGER,
+				allowNull: false
 			},
 			createdAt: {
 				allowNull: false,
