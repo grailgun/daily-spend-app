@@ -12,7 +12,7 @@ const signUp = async (req, res) => {
 	})
 		.then((user) => {
 			return res.json({
-				message: "Create user ise success",
+				message: "Create user is success",
 				data: user,
 			});
 		})

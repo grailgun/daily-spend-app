@@ -5,6 +5,9 @@ const getWallet = async (req, res) => {
 	try {
 		const wallets = await Wallet.findAll({
 			attributes: ["wallet_name", "wallet_amount"],
+			where: {
+				user_id: req.user.id,
+			},
 		});
 		return res.json(wallets);
 	} catch (error) {
@@ -47,6 +50,7 @@ const addWallet = async (req, res) => {
 			defaults: {
 				wallet_initial_amount: amount,
 				wallet_amount: amount,
+				user_id: req.user.id,
 			},
 		});
 
