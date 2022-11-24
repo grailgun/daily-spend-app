@@ -1,7 +1,6 @@
 // Import
 const express = require("express");
 const bodyParser = require("body-parser");
-const { sequelize } = require("./models");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
