@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
-//require("dotenv").config();
+require("dotenv").config();
 
 // app
 const app = express();
@@ -19,7 +19,7 @@ const app = express();
 
 app.use("/", (req, res) => {
 	res.json({
-		message: process.env.PORT,
+		message: process.env
 	});
 });
 
