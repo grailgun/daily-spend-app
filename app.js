@@ -5,7 +5,7 @@ const { sequelize } = require("./models");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
-require("dotenv").config();
+//require("dotenv").config();
 
 // app
 const app = express();
@@ -18,13 +18,19 @@ app.use(cookieParser());
 const mainRoute = require("./routes/index.js");
 app.use("/api", mainRoute);
 
+app.use("/", (req, res) => {
+	res.json({
+		message: "Hello world",
+	});
+});
+
 // Listen
 const PORT = process.env.PORT || 3000;
 function listen() {
 	app.listen(PORT, async () => {
 		console.log(`Server is connected to port : ${PORT}`);
-		await sequelize.authenticate();
-		console.log("Database Sync");
+		// await sequelize.authenticate();
+		// console.log("Database Sync");
 	});
 }
 listen();
