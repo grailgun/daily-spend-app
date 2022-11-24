@@ -1,5 +1,4 @@
 const router = require("express").Router();
-
 const spendController = require("../../controllers/spendController.js");
 
 router.post("/", spendController.addSpend);
