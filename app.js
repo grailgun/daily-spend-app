@@ -28,6 +28,6 @@ app.use("/", (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, async () => {
 	console.log(`Server is connected to port : ${PORT}`);
-	await sequelize.authenticate();
+	await sequelize.sync();
 	console.log("Database Sync");
 });
