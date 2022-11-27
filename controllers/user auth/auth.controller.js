@@ -6,15 +6,35 @@ const jwt = require("jsonwebtoken");
 const signUp = async (req, res) => {
 	const { username, password } = req.body;
 
-	User.create({
-		username: username,
-		password: bcrypt.hashSync(password, 8),
+	User.findOne({
+		attributes: ["id"],
+		where: {
+			username: username,
+		},
 	})
 		.then((user) => {
-			return res.json({
-				message: "Create user is success",
-				data: user,
-			});
+			if (user) {
+				return res.status(400).json({
+					errors: {
+						message: ["User is already exists!"]
+					}
+				});
+			}
+
+			User.create({
+				username: username,
+				password: bcrypt.hashSync(password, 8),
+			})
+				.then((user) => {
+					return res.json({
+						message: "Create user success",
+						data: user,
+					});
+				})
+				.catch((error) => {
+					console.log(error);
+					return res.json(error);
+				});
 		})
 		.catch((error) => {
 			console.log(error);
@@ -36,10 +56,12 @@ const signIn = async (req, res) => {
 
 			if (!isMatch) {
 				return res.status(401).send({
-					message: "Invalid password",
+					errors: {
+						password: ["Invalid password"],
+					},
 				});
 			}
-			
+
 			const payload = {
 				id: user.id,
 				name: user.username,
@@ -70,25 +92,62 @@ const signIn = async (req, res) => {
 					});
 
 					return res.json({
-						access_token: accessToken,
+						token: accessToken,
 					});
 				})
 				.catch((errorUpdate) => {
 					console.log(errorUpdate);
 					return res.json({
-						message: "Error when store refresh token",
+						errors: {
+							message: ["Error when store refresh token"],
+						},
 					});
 				});
 		})
 		.catch((error) => {
 			console.log(error);
 			return res.json({
-				message: "User not registered",
+				errors: {
+					message: ["User not registered"],
+				},
 			});
+		});
+};
+
+const refreshToken = async (req, res) => {
+	const refreshToken = req.cookies.refreshToken;
+	if (!refreshToken) {
+		res.status(403);
+	}
+
+	User.findOne({
+		where: {
+			refresh_token: refreshToken,
+		},
+	})
+		.then((user) => {
+			jwt.verify(refreshToken, process.env.REFRESH_KEY, (error, decoded) => {
+				if (error) res.sendStatus(403);
+				const payload = {
+					id: decoded.id,
+					name: decoded.username,
+				};
+				const accessToken = jwt.sign(payload, process.env.SECRET_KEY, {
+					expiresIn: "30s",
+				});
+				res.json({
+					access_token: accessToken,
+				});
+			});
+		})
+		.catch((error) => {
+			console.log(error);
+			res.sendStatus(403);
 		});
 };
 
 module.exports = {
 	signUp,
 	signIn,
+	refreshToken
 };

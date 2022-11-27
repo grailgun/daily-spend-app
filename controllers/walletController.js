@@ -9,9 +9,19 @@ const getWallet = async (req, res) => {
 				user_id: req.user.id,
 			},
 		});
-		return res.json(wallets);
-	} catch (error) {
-		console.log(error);
+
+		if(wallets.length === 0){
+			return res.json({
+				message: "No Wallet",
+				data : wallets
+			});	
+		}
+
+		return res.json({
+			message: "Success",
+			data : wallets
+		});
+	} catch (error) {		
 		return res.status(404).json(error);
 	}
 };

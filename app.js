@@ -1,11 +1,10 @@
 // Import
+require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const { sequelize } = require("./models");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-
-require("dotenv").config();
 
 // app
 const app = express();
@@ -18,14 +17,8 @@ app.use(cookieParser());
 const mainRoute = require("./routes/index.js");
 app.use("/api", mainRoute);
 
-app.use("/", (req, res) => {
-	res.json({
-		message: process.env,
-	});
-});
-
 // Listen
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, async () => {
 	console.log(`Server is connected to port : ${PORT}`);
 	await sequelize.sync();

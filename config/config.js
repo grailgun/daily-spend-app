@@ -1,4 +1,3 @@
-require("dotenv").config();
 
 module.exports = {
 	development: {
@@ -7,12 +6,6 @@ module.exports = {
 		database: process.env.DEV_DB_NAME,
 		host: process.env.DEV_DB_HOSTNAME,
 		dialect: "postgres",
-		dialectOptions: {
-			ssl: {
-				require: true, // This will help you. But you will see nwe error
-				rejectUnauthorized: false, // This line will fix new error
-			},
-		},
 	},
 	test: {
 		username: process.env.CI_DB_USERNAME,
@@ -20,12 +13,6 @@ module.exports = {
 		database: process.env.CI_DB_NAME,
 		host: process.env.CI_DB_HOSTNAME,
 		dialect: "postgres",
-		dialectOptions: {
-			ssl: {
-				require: true, // This will help you. But you will see nwe error
-				rejectUnauthorized: false, // This line will fix new error
-			},
-		},
 	},
 	production: {
 		username: process.env.PROD_DB_USERNAME,

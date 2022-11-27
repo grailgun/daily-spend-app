@@ -4,14 +4,15 @@ const walletRoute = require("./modules/wallets.routes");
 const spendRoute = require("./modules/spends.routes");
 const authRoute = require("./authentication user/auth.routes");
 const userRoute = require("./authentication user/user.routes");
-const authUser = require("../middleware/authJWT.js");
+const { refreshToken } = require("../controllers/user auth/auth.controller");
+const { VerifyToken } = require("../middleware/authJWT.js");
 
 router.use("/auth", authRoute);
 
-router.use("/users", authUser.VerifyToken, userRoute);
-router.use("/wallets", authUser.VerifyToken, walletRoute);
-router.use("/spends", authUser.VerifyToken, spendRoute);
+router.use("/users", VerifyToken, userRoute);
+router.use("/wallets", VerifyToken, walletRoute);
+router.use("/spends", VerifyToken, spendRoute);
 
-router.get("/token", authUser.RefreshToken);
+router.get("/token", refreshToken);
 
 module.exports = router;
