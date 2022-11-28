@@ -2,8 +2,9 @@ const { User } = require("../../models");
 
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { validationResult } = require("express-validator");
 
-const signUp = async (req, res) => {
+async function signUp(req, res) {
 	const { username, password } = req.body;
 
 	User.findOne({
@@ -16,8 +17,8 @@ const signUp = async (req, res) => {
 			if (user) {
 				return res.status(400).json({
 					errors: {
-						message: ["User is already exists!"]
-					}
+						message: ["User is already exists!"],
+					},
 				});
 			}
 
@@ -40,9 +41,17 @@ const signUp = async (req, res) => {
 			console.log(error);
 			return res.json(error);
 		});
-};
+}
 
-const signIn = async (req, res) => {
+async function signIn(req, res) {
+	const errors = validationResult(req);
+	console.log(errors);
+	if (!errors.isEmpty()) {
+		return res.status(400).json({
+			errors: errors.array(),
+		});
+	}
+
 	const { username, password } = req.body;
 
 	User.findOne({
@@ -67,13 +76,13 @@ const signIn = async (req, res) => {
 				name: user.username,
 			};
 
-			const accessToken = jwt.sign(payload, process.env.SECRET_KEY, {
-				expiresIn: "10m",
-			});
+			const accessToken = createToken(payload, process.env.SECRET_KEY, "100m");
 
-			const refreshToken = jwt.sign(payload, process.env.REFRESH_KEY, {
-				expiresIn: "1m",
-			});
+			const refreshToken = createToken(
+				payload,
+				process.env.REFRESH_KEY,
+				"100m"
+			);
 
 			User.update(
 				{
@@ -112,12 +121,12 @@ const signIn = async (req, res) => {
 				},
 			});
 		});
-};
+}
 
-const refreshToken = async (req, res) => {
+async function refreshToken(req, res) {
 	const refreshToken = req.cookies.refreshToken;
 	if (!refreshToken) {
-		res.status(403);
+		res.sendStatus(403);
 	}
 
 	User.findOne({
@@ -132,9 +141,12 @@ const refreshToken = async (req, res) => {
 					id: decoded.id,
 					name: decoded.username,
 				};
-				const accessToken = jwt.sign(payload, process.env.SECRET_KEY, {
-					expiresIn: "30s",
-				});
+
+				const accessToken = createToken(
+					payload,
+					process.env.SECRET_KEY,
+					"100m"
+				);
 				res.json({
 					access_token: accessToken,
 				});
@@ -144,10 +156,16 @@ const refreshToken = async (req, res) => {
 			console.log(error);
 			res.sendStatus(403);
 		});
-};
+}
+
+function createToken(payload, key, expiredTime) {
+	return jwt.sign(payload, key, {
+		expiresIn: expiredTime,
+	});
+}
 
 module.exports = {
 	signUp,
 	signIn,
-	refreshToken
+	refreshToken,
 };
