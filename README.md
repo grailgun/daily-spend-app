@@ -42,8 +42,8 @@
     
     | Method | Endpoint | Description | Response |
     | --- | --- | --- | --- |
-    | POST | /signIn | Login user with Username and Password | token |
-    | POST | /signUp | Register user with Username and Password |  |
+    | POST | /auth/signIn | Login user with Username and Password | token |
+    | POST | /auth/signUp | Register user with Username and Password |  |
     | POST | /refreshToken | Request new access token when expired | token |
 - **Wallet**
     
