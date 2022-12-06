@@ -1,28 +1,23 @@
+const apiResponse = require("../helpers/apiResponse");
 const { Wallet, Spend, User } = require("../models");
 
 // Get all wallet from database
 const getWallet = async (req, res) => {
 	try {
 		const wallets = await Wallet.findAll({
-			attributes: ["wallet_name", "wallet_amount"],
+			attributes: [
+				["uuid", "wallet_id"],
+				["wallet_name", "name"],
+				["wallet_amount", "amount"],
+			],
 			where: {
 				user_id: req.user.id,
 			},
 		});
 
-		if(wallets.length === 0){
-			return res.json({
-				message: "No Wallet",
-				data : wallets
-			});	
-		}
-
-		return res.json({
-			message: "Success",
-			data : wallets
-		});
-	} catch (error) {		
-		return res.status(404).json(error);
+		return apiResponse.successResponseWithData(res, "Success", wallets);
+	} catch (error) {
+		apiResponse.errorResponse(res, error);
 	}
 };
 
@@ -31,19 +26,23 @@ const getWalletById = async (req, res) => {
 	const id = req.params.id;
 	try {
 		const wallet = await Wallet.findOne({
-			attributes: ["id", ["wallet_name", "name"], ["wallet_amount", "amount"]],
-			where: { id: id },
+			attributes: [
+				["uuid", "wallet_id"],
+				["wallet_name", "name"],
+				["wallet_amount", "amount"],
+			],
+			where: {
+				uuid: id,
+				user_id: req.user.id,
+			},
 			include: Spend,
 		});
 
-		console.log(await wallet.getSpends());
-		if (!wallet) return res.status(404).json({ message: "Wallet not found" });
+		if (!wallet) return apiResponse.notFoundError(res, "Wallet not found");
 
-		return res.json({
-			data: wallet,
-		});
+		return apiResponse.successResponseWithData(res, "Success", wallet);
 	} catch (error) {
-		return res.send(error);
+		return apiResponse.errorResponse(res, error);
 	}
 };
 
@@ -64,15 +63,13 @@ const addWallet = async (req, res) => {
 			},
 		});
 
-		if (!isCreated)
-			return res.status(202).json({
-				msg: "You already created this wallet",
-				wallet: wallet,
-			});
+		if (!isCreated) {
+			return apiResponse.validationErrorWithData(res, "You already created this wallet", wallet);
+		}
 
-		return res.json(wallet);
+		return apiResponse.successResponseWithData(res, "Success create wallet", wallet);
 	} catch (error) {
-		return res.json(error);
+		return apiResponse.errorResponse(res, error);
 	}
 };
 
@@ -87,14 +84,14 @@ const modifyWallet = async (req, res) => {
 			},
 			{
 				where: {
-					id: id,
+					uuid: id,
 				},
 			}
 		);
-		res.json(checkWallet(result, "Success update the wallet!"));
+		return apiResponse.successResponse(res, "Success update the wallet!");
 	} catch (error) {
 		console.log(error);
-		return res.json(error);
+		return apiResponse.errorResponse(res, error);
 	}
 };
 
@@ -102,27 +99,18 @@ const deleteWallet = async (req, res) => {
 	const id = req.params.id;
 
 	Wallet.destroy({
-		where: { id: id },
+		where: {
+			uuid: id,
+			user_id: req.user.id,
+		},
 	})
 		.then((result) => {
-			res.json(checkWallet(result, "Success to delete the wallet!"));
+			return apiResponse.successResponse(res, "Success delete wallet");
 		})
 		.catch((error) => {
-			res.json(error);
+			return apiResponse.errorResponse(res, error);
 		});
 };
-
-function checkWallet(count, successMessage) {
-	if (count == 0) {
-		return {
-			message: "Wallet doesn't exist!",
-		};
-	} else {
-		return {
-			message: successMessage,
-		};
-	}
-}
 
 module.exports = {
 	addWallet,
