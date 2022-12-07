@@ -64,10 +64,18 @@ const addWallet = async (req, res) => {
 		});
 
 		if (!isCreated) {
-			return apiResponse.validationErrorWithData(res, "You already created this wallet", wallet);
+			return apiResponse.validationErrorWithData(
+				res,
+				"You already created this wallet",
+				wallet
+			);
 		}
 
-		return apiResponse.successResponseWithData(res, "Success create wallet", wallet);
+		return apiResponse.successResponseWithData(
+			res,
+			"Success create wallet",
+			wallet
+		);
 	} catch (error) {
 		return apiResponse.errorResponse(res, error);
 	}
@@ -78,13 +86,14 @@ const modifyWallet = async (req, res) => {
 	const walletAmount = req.body.walletAmount;
 
 	try {
-		const result = await Wallet.update(
+		await Wallet.update(
 			{
 				wallet_amount: parseFloat(walletAmount),
 			},
 			{
 				where: {
 					uuid: id,
+					user_id: req.user.id,
 				},
 			}
 		);
